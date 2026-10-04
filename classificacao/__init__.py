@@ -1,3 +1,5 @@
+"""Funções usadas pelos notebooks: dados, representação e avaliação."""
+
 from classificacao.avaliacao import (
     desenhar_matrizes,
     resumo,

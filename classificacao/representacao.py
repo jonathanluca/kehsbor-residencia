@@ -1,3 +1,9 @@
+"""TF-IDF do título mais seis sinais de forma.
+
+Vocabulário e escala saem só do treino. Pontuação, ortografia e classes
+gramaticais do corpo descrevem a checagem, não a manchete, e ficam de fora.
+"""
+
 from functools import lru_cache
 
 import numpy as np
@@ -10,11 +16,20 @@ from sklearn.preprocessing import StandardScaler
 
 @lru_cache(maxsize=1)
 def palavras_de_parada():
+    """Stopwords em português, como lista.
+
+    O TfidfVectorizer recusa tupla. O cache evita baixar de novo a cada dobra.
+    """
     nltk.download("stopwords", quiet=True)
     return stopwords.words("portuguese")
 
 
 def sinais_da_manchete(tabela):
+    """Forma da manchete que separa as classes.
+
+    Reportagem usa mais aspas e dois-pontos. Boato começa em minúscula e
+    traz mais número. O sentimento já veio pronto no CSV: não é ajustado no rótulo.
+    """
     titulo = tabela["titulo"]
     return pd.DataFrame(
         {
@@ -30,7 +45,11 @@ def sinais_da_manchete(tabela):
 
 
 def representar(titulos_treino, sinais_treino, titulos_teste, sinais_teste):
-    # Palavras e escala saem só do treino, para o teste não vazar.
+    """Monta a mesma matriz para os três modelos.
+
+    A floresta não aceita matriz esparsa, então o TF-IDF vira denso antes
+    de receber os seis sinais já na escala do treino.
+    """
     vetor = TfidfVectorizer(
         lowercase=True,
         stop_words=palavras_de_parada(),
